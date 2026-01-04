@@ -23,6 +23,7 @@ $formFields = [
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen bg-background">
     <form
+        action="/api/auth/signup"
         id="signup-form"
         method="POST"
         class="
@@ -64,67 +65,83 @@ $formFields = [
         <p class="text-center text-muted-foreground text-sm">
             Already have an account? <a href="./login" class="text-primary hover:underline">Log in</a>
         </p>
+
+        <template id="form-error-template">
+            <div class=" p-3 bg-red-500/20 border border-red-500 text-red-700 rounded-md text-sm" id="form-error">
+                <span id="form-error-message"></span>
+            </div>
+        </template>
     </form>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        (function(){
             const form = document.getElementById('signup-form');
-        
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault(); // prevent normal form submit
+            /** @type {HTMLTemplateElement} */
+            const formErrorTemplate = document.getElementById('form-error-template');
+            const endpoint = form.action;
             
-                // gather form data
-                const formData = {};
-                new FormData(form).forEach((value, key) => {
-                    formData[key] = value;
-                });
-            
-                // optional: disable submit button while submitting
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-            
-                // remove previous error messages
-                const prevError = form.querySelector('.form-error');
-                if (prevError) prevError.remove();
-            
-                try {
-                    const res = await fetch(form.action || window.location.pathname, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
+            function renderFormError(msg){
+                let errorContainer = document.getElementById('form-error');
+
+                if (!errorContainer) {
+                    errorContainer = formErrorTemplate.content.cloneNode(true);
+                    form.append(errorContainer);
+                }
+
+                document.getElementById('form-error-message').innerText = msg;
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+
+                form.addEventListener('submit', async    (e) => {
+                    e.preventDefault(); // prevent normal form submit
+                
+                    // gather form data
+                    const formData = {};
+                    new FormData(form).forEach((value, key) => {
+                        formData[key] = value;
                     });
                 
-                    const data = await res.json();
+                    // optional: disable submit button while submitting
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
                 
-                    if (res.ok) {
-                        // handle success, e.g., redirect
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
+                    // remove previous error messages
+                    const prevError = form.querySelector('.form-error');
+                    if (prevError) prevError.remove();
+                
+                    try {
+                        const res = await fetch(form.action || window.location.pathname, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                    
+                        const data = await res.json();
+                    
+                        if (res.ok) {
+                            // handle success, e.g., redirect
+                            if (data.redirect) {
+                                window.location.href = data.redirect;
+                            } else {
+                                alert('Signup successful!');
+                            }
                         } else {
-                            alert('Signup successful!');
+                            // handle server validation errors
+                            const errMsg = data.error || 'Something went wrong';
+                            renderFormError(errMsg);
                         }
-                    } else {
-                        // handle server validation errors
-                        const errMsg = data.error || 'Something went wrong';
-                        const div = document.createElement('div');
-                        div.className = 'form-error p-3 bg-red-500/20 border border-red-500 text-red-700 rounded-md text-sm';
-                        div.textContent = errMsg;
-                        form.prepend(div);
+                    } catch (err) {
+                        renderFormError('Network Error!');
+                    } finally {
+                        submitBtn.disabled = false;
                     }
-                } catch (err) {
-                    console.error(err);
-                    const div = document.createElement('div');
-                    div.className = 'form-error p-3 bg-red-500/20 border border-red-500 text-red-700 rounded-md text-sm';
-                    div.textContent = 'Network error, please try again';
-                    form.prepend(div);
-                } finally {
-                    submitBtn.disabled = false;
-                }
+                });
             });
-        });
+        })()
     </script>
 </body>
 </html>

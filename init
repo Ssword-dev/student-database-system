@@ -1,6 +1,7 @@
 <?php
 
-$dbInit = file_get_contents(__DIR__ . "/src/schema.sql");;
+$dbInit = file_get_contents(__DIR__ . "/database/schema.sql");
+;
 
 $conn = mysqli_connect('localhost', 'root', '');
 
@@ -10,7 +11,7 @@ if (!$conn) {
 
 $success = $conn->multi_query($dbInit);
 
-if (!$success){
+if (!$success) {
     die("Failed to initialize database.");
 }
 
