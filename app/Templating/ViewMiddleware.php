@@ -5,17 +5,11 @@ use App\Router\Request;
 use App\Router\Response;
 use Lazervel\Path\Path;
 
-function _renderViewInIsolation($view, $data = array()): string
-{
-    ob_start();
-    extract($data, EXTR_SKIP);
-    include $view;
-    $html = ob_get_clean();
-    return $html;
-}
 
 final class ViewMiddleware
 {
+    use TemplatingHelpers;
+
     private string $viewDir;
 
     public function __construct(string $viewDir)
@@ -27,7 +21,6 @@ final class ViewMiddleware
     {
         $response = $response ?? new Response();
 
-        // normalize request path only by removing leading slash
         $relPath = ltrim($request->path, '/');
 
         // this check allows visiting / and seeing index.php
@@ -70,7 +63,7 @@ final class ViewMiddleware
         }
 
         // render the view.
-        $html = _renderViewInIsolation($viewFile, []);
+        $html = $this->renderViewInIsolation($viewFile, []);
 
         // try to render with layouts if they exist.
         $layoutDirRel = Path::relative($this->viewDir, Path::dirname($viewFile));
@@ -80,7 +73,7 @@ final class ViewMiddleware
             $layoutFile = Path::join($layoutDirAbs, '_layout.php');
 
             if (file_exists($layoutFile)) {
-                $html = _renderViewInIsolation($layoutFile, ['content' => $html]);
+                $html = $this->renderViewInIsolation($layoutFile, ['content' => $html]);
             }
 
             if ($layoutDirRel === '.') {
