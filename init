@@ -1,6 +1,6 @@
 <?php
 
-$dbInit = file_get_contents(__DIR__ . "/database/schema.sql");
+$dbInit = file_get_contents(__DIR__ . "/database/schema/schema.sql");
 ;
 
 $conn = mysqli_connect('localhost', 'root', '');

@@ -36,7 +36,7 @@ $paginatedFormFields = array_chunk($formFields, 3);
     >
         <h1 class="text-2xl font-semibold text-center">Sign Up</h1>
 
-        <div class="flex flex-row paginated-form translate-x-[calc(-100%_*_var(--page))] overflow-hidden" id="form-page-carousel" style="--page: 0;">
+        <div class="flex flex-row paginated-form translate-x-[calc(-100%_*_var(--page))] overflow-hidden" id="form-page-carousel" style="translate: 0% 0;">
             <?php foreach($paginatedFormFields as $formFields): ?>
                 <div class="flex flex-col paginated-form-page gap-6 h-full w-full shrink-0">
                     <?php foreach ($formFields as $field): ?>
@@ -132,6 +132,7 @@ $paginatedFormFields = array_chunk($formFields, 3);
             const templateContainerElement = document.getElementById('templates');
             const templateElements = Array.from(templateContainerElement.children);
             const templates = {};
+            const maxPage = <?= count($paginatedFormFields) ?>;
 
             templateElements.forEach((el) => {
                 templates[el.id] = el;
@@ -144,8 +145,12 @@ $paginatedFormFields = array_chunk($formFields, 3);
             let currentPage = 1;
 
             function onPageChange(){
-
+                
             }
+
+            function initPageActions() {}
+
+            
 
             function gotoPage(page){
                 currentPage = page;

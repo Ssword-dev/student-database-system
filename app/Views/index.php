@@ -1,3 +1,12 @@
+<?php
+$features = [
+    [
+        'title' => 'student records',
+        'subtitle' => 'store and manage student profiles, sections, and details in one place.'
+    ]
+];
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -82,7 +91,8 @@
 
     <!-- footer -->
     <footer class="py-8 text-center text-sm text-muted-foreground">
-        © <?= date("Y") ?> student_db. all rights reserved.
+        © <?= date("Y") ?>
+        <?= $_ENV['APP_NAME'] ?>. all rights reserved.
     </footer>
 
 </body>
